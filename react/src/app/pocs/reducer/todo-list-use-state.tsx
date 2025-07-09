@@ -5,7 +5,7 @@ interface Item {
     name: string
     checked: boolean
 }
-export function TodoList() {
+export function TodoListUseState() {
     const [checkList, setCheckList] = useState<Item[]>([])
     const [newItem, setNewItem] = useState('')
 
@@ -25,8 +25,6 @@ export function TodoList() {
             }
             return item
         }))
-
-
     }
 
     function handleRemoveItem(id: string) {
