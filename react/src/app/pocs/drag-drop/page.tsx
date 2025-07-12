@@ -3,9 +3,10 @@ import { closestCorners, DndContext, DragEndEvent, KeyboardSensor, PointerSensor
 import { useState } from "react";
 import { Collumn } from "./collumn";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import Link from "next/link";
 
 export default function DragDropPage() {
-    // Based on this video: https://www.youtube.com/watch?v=dL5SOdgMbRY
+    // Based on this video: 
 
     const [tasks, setTasks] = useState([{
         id: 1,
@@ -60,6 +61,7 @@ export default function DragDropPage() {
         <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold">Todo List Drag and Drop</h1>
             <p className="text-gray-100">This page demonstrates a drag-and-drop todo list.</p>
+            <p> Original video : <Link target="_blank" href={`https://www.youtube.com/watch?v=dL5SOdgMbRY`}> link</Link></p>
             <section className="w-full h-full dark:text-white">
                 <h1>Todo app</h1>
                 {/* All dragabble components must be inside this context */}
