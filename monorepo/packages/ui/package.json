@@ -1,0 +1,17 @@
+{
+  "name": "@monorepo/ui",
+  "version": "1.0.0",
+  "description": "This folder represents a UI Library",
+  "main": "./src/index.ts",
+  "types": "./src/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2"
+  }
+}
