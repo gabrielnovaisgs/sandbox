@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ReplicaSet
+metadata:
+  name: 
+  labels:
+    app: app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: gabrielnovaisgs/response-pod:latest
+
