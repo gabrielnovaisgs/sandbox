@@ -1,0 +1,28 @@
+#cloud-config
+hostname: ubuntu-vm-1
+fqdn: ubuntu-vm-1.local
+
+users:
+  - name: gabriel
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICzK/2w/gtx0UMJZsyeO1Kt16mHPs+GvGQsEa1+1M1T2 gabrielnovaisgs@gmail.com
+    lock_passwd: false
+    passwd: '$6$rounds=4096$ED.genr8O/IZRcad$WcIGeY7ebeWKa4SEkJIrq/AHG.8wRBue1vsVi9FNeqPK7HVFmAlXI/TeAO2XZ.nVTwem4gCHDXFGvWfukP9MP/'  # senha: ubuntu (para backup)
+
+ssh_pwauth: true
+
+packages:
+  - vim
+  - curl
+  - wget
+  - htop
+
+package_update: true
+package_upgrade: false
+
+timezone: America/Sao_Paulo
+
+final_message: "VM pronta em $UPTIME segundos!"
