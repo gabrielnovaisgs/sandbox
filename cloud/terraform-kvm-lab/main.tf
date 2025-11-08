@@ -40,30 +40,70 @@ resource "libvirt_cloudinit_disk" "commoninit" { # create the "cd room"
   meta_data = file("${path.module}/cloud-init/user-data.yaml")
 }
 
-#resource "libvirt_domain" "vm1" {
-#  name   = "ubuntu-vm-1"
-#  memory = "2048"
-#  vcpu   = 2
-#
-#  cloudinit = libvirt_cloudinit_disk.commoninit.id
-#
-#  disk {
-#    volume_id = libvirt_volume.vm_disk.id
-#  }
-#
-#  network_interface {
-#    network_interface = "default"
-#  }
-#
-#  console {
-#    type        = "pty"
-#    target_type = "serial"
-#    target_port = "0"
-#  }
-#
-#  graphics {
-#    type        = "spice"
-#    listen_type = "address"
-#    autoport    = true
-#  }
-#}
+resource "libvirt_volume" "vm1_cloudinit" {
+  name = "vm1-cloudinit.iso"
+  pool = "iso"
+  create = {
+    content = {
+      url = libvirt_cloudinit_disk.commoninit.path
+    }
+  }
+}
+
+
+resource "libvirt_domain" "vm1" {
+  name   = "ubuntu-vm-1"
+  memory = 2 * 1024 * 1024
+  vcpu   = 2
+  os = {
+    type    = "hvm"
+    arch    = "x86_64"
+    machine = "q35"
+  }
+  devices = {
+    disks = [
+      {
+        target = {
+          dev = "vda"
+          bus = "virtio"
+        }
+        source = {
+          pool   = libvirt_volume.vm_disk.pool
+          volume = libvirt_volume.vm_disk.name
+        }
+      },
+      {
+        device = "cdrom"
+        source = {
+          pool   = libvirt_volume.vm1_cloudinit.pool
+          volume = libvirt_volume.vm1_cloudinit.name
+        }
+        target = {
+          dev = "sda"
+          bus = "sata"
+        }
+
+      }
+    ]
+
+    interfaces = [
+      {
+        type  = "network"
+        model = "virtio"
+        source = {
+          network = "default"
+        }
+      }
+    ]
+
+    graphics = {
+      vnc = {
+        autoport = "yes"
+        listen   = "127.0.0.1"
+      }
+    }
+
+  }
+  running = true
+
+}

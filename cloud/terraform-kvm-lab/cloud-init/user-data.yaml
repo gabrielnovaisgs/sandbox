@@ -14,6 +14,12 @@ users:
 
 ssh_pwauth: true
 
+network:
+  version: 2
+  ethernets:
+    enp1s0:
+      dhcp4: true # Activate DHCP to have an ip address
+
 packages:
   - vim
   - curl
@@ -26,3 +32,4 @@ package_upgrade: false
 timezone: America/Sao_Paulo
 
 final_message: "VM pronta em $UPTIME segundos!"
+
