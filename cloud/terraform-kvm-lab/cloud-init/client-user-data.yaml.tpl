@@ -1,6 +1,6 @@
 #cloud-config
-hostname: ubuntu-vm-1
-fqdn: ubuntu-vm-1.local
+hostname: ${hostname}
+fqdn: ${hostname}.local
 
 users:
   - name: gabriel
@@ -8,7 +8,7 @@ users:
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICzK/2w/gtx0UMJZsyeO1Kt16mHPs+GvGQsEa1+1M1T2 gabrielnovaisgs@gmail.com
+      - ${ssh_key}
     lock_passwd: false
     passwd: '$6$rounds=4096$ED.genr8O/IZRcad$WcIGeY7ebeWKa4SEkJIrq/AHG.8wRBue1vsVi9FNeqPK7HVFmAlXI/TeAO2XZ.nVTwem4gCHDXFGvWfukP9MP/'  # senha: ubuntu (para backup)
 
