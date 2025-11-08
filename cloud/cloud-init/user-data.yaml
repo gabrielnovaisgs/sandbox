@@ -1,0 +1,15 @@
+#cloud-config
+chpasswd:
+  expire: False
+ssh_pwauth: True
+
+users:
+  - default
+  - name: gabriel
+    gecos: Gabriel # Contacts of user
+    primary_group: users
+    lock_passwd: false # Disable password login (default is true)
+    passwd: '$6$rounds=4096$ED.genr8O/IZRcad$WcIGeY7ebeWKa4SEkJIrq/AHG.8wRBue1vsVi9FNeqPK7HVFmAlXI/TeAO2XZ.nVTwem4gCHDXFGvWfukP9MP/' # hashed password for user
+
+
+

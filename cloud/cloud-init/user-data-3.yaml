@@ -1,0 +1,32 @@
+#cloud-config
+hostname: ubuntu-lab
+fqdn: ubuntu-lab.local
+
+users:
+  - default
+  - name: gabriel
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICzK/2w/gtx0UMJZsyeO1Kt16mHPs+GvGQsEa1+1M1T2 gabrielnovaisgs@gmail.com
+    lock_passwd: false
+    plain_text_passwd: senha
+    chpasswd:
+      expire: False
+ssh_pwauth: True
+
+network:
+  version: 2
+  ethernets:
+    enp1s0:
+      dhcp4: true
+
+packages:
+  - vim
+  - curl
+  - wget
+  - htop
+
+package_update: true
+package_upgrade: false
+
