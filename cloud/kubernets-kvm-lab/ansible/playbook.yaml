@@ -222,6 +222,12 @@
         enabled: true
         state: restarted
 
+    - name: Install CNI (Weave Net)
+      remote_user: gabriel
+      ansible.builtin.command:
+        cmd: kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+      changed_when: false
+
     - name: Get the kubeadm join command
       become: true
       ansible.builtin.command:
@@ -232,4 +238,27 @@
     - name: Set join command as a fact
       ansible.builtin.set_fact:
         join_command: "{{ join_command_raw.stdout }}"
-#- name: Play 3 -
+
+- name: Play 3 - Preparando o node worker
+  hosts: k8s_workers
+  tasks:
+    - name: Open worker ports (tcp) # https://v1-33.docs.kubernetes.io/docs/reference/networking/ports-and-protocols/
+      become: true
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        proto: tcp
+        port: "{{ item }}"
+      loop:
+        - 10250
+        - 20256
+        - 30000:32767
+        - 22
+
+    - name: Open worker ports (udp)
+      become: true
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        proto: udp
+        port: 30000:32767
