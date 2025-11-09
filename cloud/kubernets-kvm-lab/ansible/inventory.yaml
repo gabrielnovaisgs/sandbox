@@ -2,7 +2,8 @@ all:
   vars:
     ansible_user: gabriel
     ansible_ssh_private_key_file: ~/.ssh/cloud-init-local
-    ansible_ssh_common_args: '-o IdentitiesOnly=yes'
+    # pede para o ansible não checar as chavees no host e tbm não salvar o know-hosts
+    ansible_ssh_common_args: '-o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
   children:
     k8s_masters:
       hosts:
