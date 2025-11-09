@@ -37,10 +37,12 @@ resource "libvirt_volume" "cloudinit_disk" {
 
 
 resource "libvirt_domain" "vm" {
-  for_each = local.vms
-  name     = "${each.key}-vm"
-  memory   = each.value.memory_mb * 1024
-  vcpu     = each.value.vcpu
+  for_each  = local.vms
+  name      = "${each.key}-vm"
+  memory    = each.value.memory_mb * 1024
+  vcpu      = each.value.vcpu
+  autostart = true
+  running   = true
   os = {
     type    = "hvm"
     arch    = "x86_64"
@@ -90,6 +92,6 @@ resource "libvirt_domain" "vm" {
     }
 
   }
-  running = true
+
 
 }
