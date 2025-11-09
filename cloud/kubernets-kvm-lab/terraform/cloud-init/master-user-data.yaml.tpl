@@ -20,7 +20,7 @@ network:
     enp1s0:
       addresses:
         - 196.168.124.6/24
-      dhcp4: true # Activate DHCP to have an ip address
+      #dhcp4: true # Activate DHCP to have an ip address
 
 packages:
   - vim

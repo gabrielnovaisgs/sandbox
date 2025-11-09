@@ -18,12 +18,11 @@ resource "libvirt_volume" "ubuntu_base" { # create the imutable image
   format = "qcow2"                        # the format saved
   create = {
     content = { # from where ? can be local too
-      url = var.base_image_url
+      #url = var.base_image_url
+      url = var.base_image_path
     }
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  
 
 }

@@ -10,6 +10,12 @@ variable "base_image_url" {
   default     = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
 }
 
+variable "base_image_path" {
+  description = "URL da imagem base Ubuntu"
+  type        = string
+  default     = "/home/gabriel/.kvm/iso/noble-server-cloudimg-amd64.img"
+}
+
 variable "ssh_public_key" {
   description = "Chave SSH pública para acesso às VMs"
   type        = string

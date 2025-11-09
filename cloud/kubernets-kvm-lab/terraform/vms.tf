@@ -22,6 +22,9 @@ resource "libvirt_cloudinit_disk" "init" { # create the "cd room"
   meta_data = templatefile("${path.module}/cloud-init/meta-data.yaml.tpl", {
     hostname = each.key
   })
+  network_config = templatefile("${path.module}/cloud-init/network-config.yaml.tpl", {
+    ip_address = each.value.ip_address
+  })
 }
 
 resource "libvirt_volume" "cloudinit_disk" {
