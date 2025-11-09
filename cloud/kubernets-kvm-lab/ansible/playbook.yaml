@@ -133,8 +133,103 @@
         name:
           - containerd.io
 
-    #- name: Open firewall ports
-    #  community.general.ufw:
-    #    state: enabled
-    #    rule: allow
-    #    port: "{{item}}"
+    - name: Create containerd config
+      become: true
+      ansible.builtin.command:
+        cmd: "containerd config default | tee /etc/containerd/config.toml"
+      args:
+        creates: /etc/containerd/config.toml
+
+    - name: Enable the CRI plugin in containerd
+      become: true
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        #  habilita o plugin do K8s
+        regexp: 'disabled_plugins = \["cri"\]'
+        replace: '# disabled_plugins = ["cri"]'
+
+    - name: Config cgroup
+      become: true
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        regexp: "SystemdCgroup = false"
+        replace: "SystemdCgroup = true"
+
+    - name: Restart container.d
+      become: true
+      ansible.builtin.systemd:
+        name: containerd
+        enabled: true
+        state: restarted
+
+    - name: Enable kubelet
+      become: true
+      ansible.builtin.systemd:
+        name: kubelet
+        enabled: true
+        state: started
+
+- name: Play 2 - Preparando o node master
+  hosts: k8s_masters
+  tasks:
+    - name: Open master ports
+      become: true
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        proto: tcp
+        port: "{{ item }}"
+      loop:
+        - 6443
+        - 2379:2380
+        - 10250
+        - 10259
+        - 10257
+        - 22
+
+    - name: Init kubeadm
+      become: true
+      ansible.builtin.command:
+        cmd: "kubeadm init --pod-network-cidr=10.10.0.0/16 --apiserver-advertise-address=192.168.124.2"
+      args:
+        creates: /etc/kubernetes/admin.conf
+      async: 600 # 10 minutos
+      poll: 5
+
+    - name: Create .kube folder
+      become: true
+      ansible.builtin.file:
+        path: /home/gabriel/.kube
+        state: directory
+        owner: gabriel
+        group: gabriel
+        mode: "0700"
+
+    - name: Copy kube config
+      become: true
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/gabriel/.kube/config
+        owner: gabriel
+        group: gabriel
+        mode: "0600"
+        remote_src: true # diz para ansible que o src é remoto e não local
+
+    - name: Restart kubelet
+      become: true
+      ansible.builtin.systemd:
+        name: kubelet
+        enabled: true
+        state: restarted
+
+    - name: Get the kubeadm join command
+      become: true
+      ansible.builtin.command:
+        cmd: "kubeadm token create --print-join-command"
+      register: join_command_raw
+      changed_when: false
+
+    - name: Set join command as a fact
+      ansible.builtin.set_fact:
+        join_command: "{{ join_command_raw.stdout }}"
+#- name: Play 3 -
