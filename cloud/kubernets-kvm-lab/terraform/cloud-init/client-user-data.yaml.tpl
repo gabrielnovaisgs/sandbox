@@ -25,6 +25,7 @@ packages:
   - curl
   - wget
   - htop
+  - python3
 
 package_update: true
 package_upgrade: false

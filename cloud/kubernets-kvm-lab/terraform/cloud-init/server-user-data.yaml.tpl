@@ -18,6 +18,8 @@ network:
   version: 2
   ethernets:
     enp1s0:
+      addresses:
+        - 196.168.124.6/24
       dhcp4: true # Activate DHCP to have an ip address
 
 packages:
@@ -25,6 +27,7 @@ packages:
   - curl
   - wget
   - htop
+  - python3
 
 package_update: true
 package_upgrade: false
