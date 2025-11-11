@@ -170,7 +170,7 @@
         state: started
 
 - name: Play 2 - Preparando o node master
-  hosts: k8s_masters
+  hosts: k8s_master
   tasks:
     - name: Open master ports (tcp)
       become: true
@@ -282,8 +282,8 @@
         proto: udp
         port: 30000:32767
 
-    - name: Join worker to cluster
+    - name: Join node to cluster
       become: true
       ansible.builtin.command:
-        cmd: { { join_command_raw.stdout } }
+        cmd: "{{ hostvars['k8s_master']['join_command'] }}" # get variable from the previous host
       changed_when: false
