@@ -3,7 +3,7 @@ locals { # are like constants, in this case an object
     "k8s-master" = {
       role         = "master"
       memory_mb    = 4 * 1024
-      vcpu         = 2
+      vcpu         = 4
       disk_size_gb = 20
       ip_address = "192.168.124.2"
     }

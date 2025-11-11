@@ -172,7 +172,7 @@
 - name: Play 2 - Preparando o node master
   hosts: k8s_masters
   tasks:
-    - name: Open master ports
+    - name: Open master ports (tcp)
       become: true
       community.general.ufw:
         state: enabled
@@ -186,6 +186,15 @@
         - 10259
         - 10257
         - 22
+        - 6783
+
+    - name: Open master ports (udp)
+      become: true
+      community.general.ufw:
+        state: enabled
+        rule: allow
+        proto: udp
+        port: 6783:6784
 
     - name: Init kubeadm
       become: true
@@ -221,6 +230,16 @@
         name: kubelet
         enabled: true
         state: restarted
+
+    - name: Wait for API server to be ready
+      remote_user: gabriel
+      ansible.builtin.command:
+        cmd: kubectl get --raw /healthz
+      register: api_health
+      until: api_health.rc == 0
+      retries: 30
+      delay: 10
+      changed_when: false
 
     - name: Install CNI (Weave Net)
       remote_user: gabriel
