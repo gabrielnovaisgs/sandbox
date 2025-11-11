@@ -174,7 +174,7 @@
   tasks:
     - name: Open master ports (tcp)
       become: true
-      community.general.ufw:
+      community.general.ufw: # https://v1-33.docs.kubernetes.io/docs/reference/networking/ports-and-protocols/ and weave port
         state: enabled
         rule: allow
         proto: tcp
@@ -281,3 +281,9 @@
         rule: allow
         proto: udp
         port: 30000:32767
+
+    - name: Join worker to cluster
+      become: true
+      ansible.builtin.command:
+        cmd: { { join_command_raw.stdout } }
+      changed_when: false
