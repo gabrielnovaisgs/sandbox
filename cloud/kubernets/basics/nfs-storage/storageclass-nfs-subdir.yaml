@@ -1,11 +1,14 @@
+# Provision based on https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
+
 apiVersion: storage.k8s.io/v1 # Versão da API do Kubernetes
 kind: StorageClass # Tipo de objeto que estamos criando, no caso um StorageClass
 metadata: # Informações sobre o objeto
-  name: nfs-lab # Nome do nosso StorageClass
+  name: nfs-subdir-lab # Nome do nosso StorageClass
   annotations:
     storageclass.kubernetes.io/is-default-class: "false"
-provisioner: kubernetes.io/no-provisioner # Provisionador que será utilizado para criar o PV
+provisioner: cluster.local/nfs-subdir-external-provisioner # Utilizando o nfs-provision
 reclaimPolicy: Retain # Política de reivindicação do PV, ou seja, o PV não será excluído quando o PVC for excluído
-volumeBindingMode: WaitForFirstConsumer
+volumeBindingMode: Immediate
 parameters: # Parâmetros que serão utilizados pelo provisionador
-  archiveOnDelete: "false" # Parâmetro que indica se os dados do PV devem ser arquivados quando o PV for excluído
+  archiveOnDelete: "false"
+  pathPattern: ${.PVC.namespace}-${.PVC.name} # em que pasta os dados de cada PVC serão salvos
