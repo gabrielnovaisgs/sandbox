@@ -1,0 +1,26 @@
+syntax = "proto3"; //version of the protobuffer
+
+
+message InputNumbers {
+    float first_number = 1; // the number is the position in the binary, to know wich elemtent is in the stream
+    float second_number = 2;
+}
+
+message CalcResponse {
+    float response = 1;
+}
+// Calculate services
+service Calculator {
+
+  // Multiplies two input numbers and returns the result.
+  rpc Multiply(InputNumbers) returns (CalcResponse);
+
+  // Sums two input numbers and returns the result.
+  rpc Sum(InputNumbers) returns (CalcResponse);
+
+  // Divides the first number by the second and returns the result.
+  rpc Div(InputNumbers) returns (CalcResponse);
+
+  // Subtracts the second number from the first and returns the result.
+  rpc Sub(InputNumbers) returns (CalcResponse);
+}
