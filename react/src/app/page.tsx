@@ -7,6 +7,7 @@ export default function Home() {
       <Link href={"/pocs/reducer"}>Reducer</Link>
       <Link href={"/pocs/reducer-context"}>Reducer + API Context</Link>
       <Link href={"/pocs/drag-drop"}>Todo list drag and drop</Link>
+      <Link href={"/pocs/code-mirror"}>Code Mirror</Link>
     </div>
   );
 }
