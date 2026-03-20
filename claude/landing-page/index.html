@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travlog — Your Next Great Adventure Awaits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       RESET & FOUNDATIONS
+       ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --bg:          #080B14;
+      --bg-card:     #0F1320;
+      --bg-elevated: #161B2E;
+      --bg-glass:    rgba(8, 11, 20, .7);
+      --gold:        #C8A862;
+      --gold-bright: #E2C87C;
+      --coral:       #E8603C;
+      --coral-glow:  rgba(232, 96, 60, .4);
+      --teal:        #3ECFB4;
+      --text:        #F0EBE3;
+      --text-muted:  #6B6760;
+      --text-dim:    #3A3832;
+      --radius:      1.25rem;
+      --radius-lg:   2rem;
+    }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: 'Syne', sans-serif; }
+
+    /* ═══════════════════════════════════════════════════════
+       FILM GRAIN OVERLAY
+       ═══════════════════════════════════════════════════════ */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SCROLL PROGRESS BAR
+       ═══════════════════════════════════════════════════════ */
+    .scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--coral), var(--gold));
+      z-index: 1000;
+      transition: width .1s linear;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SCROLL ANIMATIONS
+       ═══════════════════════════════════════════════════════ */
+    [data-animate] {
+      opacity: 0;
+      transition: opacity .8s cubic-bezier(.16,1,.3,1),
+                  transform .8s cubic-bezier(.16,1,.3,1);
+    }
+    [data-animate="fade-up"]    { transform: translateY(50px); }
+    [data-animate="fade-left"]  { transform: translateX(-50px); }
+    [data-animate="fade-right"] { transform: translateX(50px); }
+    [data-animate="scale-in"]   { transform: scale(.88); }
+    [data-animate="fade"]       { transform: none; }
+
+    [data-animate].visible {
+      opacity: 1;
+      transform: translateY(0) translateX(0) scale(1);
+    }
+
+    /* stagger delays */
+    [data-delay="1"] { transition-delay: .1s; }
+    [data-delay="2"] { transition-delay: .2s; }
+    [data-delay="3"] { transition-delay: .3s; }
+    [data-delay="4"] { transition-delay: .4s; }
+    [data-delay="5"] { transition-delay: .5s; }
+    [data-delay="6"] { transition-delay: .6s; }
+
+    /* ═══════════════════════════════════════════════════════
+       NAVBAR
+       ═══════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 0 clamp(1.5rem, 4vw, 4rem);
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background .4s, box-shadow .4s;
+    }
+    .nav.scrolled {
+      background: rgba(8, 11, 20, .85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 rgba(200,168,98,.08);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-brand span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: color .3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      border-radius: 50px;
+      padding: .55rem 1.6rem;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+    }
+    .nav-cta:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HERO — FULL-SCREEN CINEMATIC
+       ═══════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .hero-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      will-change: transform;
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(8,11,20,.3) 0%, rgba(8,11,20,.15) 30%, rgba(8,11,20,.6) 70%, var(--bg) 100%),
+        radial-gradient(ellipse at 30% 50%, rgba(200,168,98,.08) 0%, transparent 60%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 900px;
+      padding: 0 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .4rem 1.2rem;
+      border: 1px solid rgba(200,168,98,.3);
+      border-radius: 50px;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      animation: fadeSlideDown .8s .2s ease both;
+    }
+    .hero-tag i { font-size: .65rem; }
+
+    .hero-title {
+      font-size: clamp(3rem, 7.5vw, 6.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--text);
+      letter-spacing: -.01em;
+    }
+    .hero-title .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40px) rotateX(15deg);
+      animation: wordReveal .9s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-bright);
+      font-weight: 400;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 400;
+      color: rgba(240,235,227,.55);
+      max-width: 52ch;
+      line-height: 1.7;
+      animation: fadeSlideUp 1s .9s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      animation: fadeSlideUp 1s 1.1s ease both;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .9rem 2.2rem;
+      border-radius: 50px;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .35s;
+      border: none;
+    }
+    .btn-hero.primary {
+      background: var(--coral);
+      color: white;
+      box-shadow: 0 8px 32px var(--coral-glow);
+    }
+    .btn-hero.primary:hover {
+      background: #d44e2e;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px var(--coral-glow);
+    }
+    .btn-hero.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid rgba(240,235,227,.2);
+    }
+    .btn-hero.ghost:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      animation: fadeIn 1s 1.5s ease both;
+    }
+    .hero-scroll span {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--text-muted);
+    }
+    .scroll-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(180deg, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes wordReveal {
+      to { opacity: 1; transform: translateY(0) rotateX(0); }
+    }
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: .3; transform: scaleY(1); }
+      50%      { opacity: 1;  transform: scaleY(1.2); transform-origin: top; }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       STATS RIBBON
+       ═══════════════════════════════════════════════════════ */
+    .stats {
+      position: relative;
+      padding: 4.5rem clamp(1.5rem, 4vw, 4rem);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .stats::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,168,98,.3), transparent);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 300;
+      color: var(--gold-bright);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: .5rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       DESTINATIONS — 3D TILT CARDS
+       ═══════════════════════════════════════════════════════ */
+    .destinations {
+      padding: 6rem clamp(1.5rem, 4vw, 4rem);
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .section-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: .75rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1px;
+      background: var(--gold);
+    }
+
+    .section-heading {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      max-width: 18ch;
+    }
+
+    .section-sub {
+      font-size: .95rem;
+      color: var(--text-muted);
+      max-width: 38ch;
+      line-height: 1.7;
+    }
+
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .dest-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform .4s ease, box-shadow .4s ease;
+      will-change: transform;
+      aspect-ratio: 3/4;
+    }
+    .dest-card:hover {
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.5),
+        0 0 80px rgba(200,168,98,.08);
+    }
+
+    .dest-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .6s cubic-bezier(.16,1,.3,1);
+    }
+    .dest-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .dest-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        transparent 30%,
+        rgba(8,11,20,.4) 60%,
+        rgba(8,11,20,.92) 100%
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      z-index: 2;
+    }
+
+    .dest-tag {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      background: rgba(8,11,20,.55);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(200,168,98,.2);
+      border-radius: 50px;
+      padding: .3rem .8rem;
+      font-size: .65rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      z-index: 3;
+    }
+
+    .dest-info h3 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: .25rem;
+    }
+
+    .dest-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-bottom: .75rem;
+    }
+    .dest-meta i { color: var(--gold); font-size: .65rem; }
+    .dest-meta .rating { color: var(--gold-bright); font-weight: 600; }
+
+    .dest-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dest-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .dest-price small {
+      font-size: .65rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      font-family: 'Syne', sans-serif;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .dest-book {
+      background: var(--coral);
+      border: none;
+      color: white;
+      border-radius: 50px;
+      padding: .5rem 1.2rem;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .35s;
+    }
+    .dest-card:hover .dest-book {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .dest-book:hover {
+      background: #d44e2e;
+    }
+
+    /* 3D glare */
+    .dest-glare {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      border-radius: var(--radius-lg);
+      opacity: 0;
+      transition: opacity .3s;
+      background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255,255,255,.12) 0%,
+        transparent 60%
+      );
+    }
+    .dest-card:hover .dest-glare { opacity: 1; }
+
+    /* ═══════════════════════════════════════════════════════
+       EXPERIENCE SECTION — PARALLAX SPLIT
+       ═══════════════════════════════════════════════════════ */
+    .experience {
+      padding: 8rem clamp(1.5rem, 4vw, 4rem);
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: clamp(2rem, 6vw, 5rem);
+      align-items: center;
+    }
+
+    .exp-image-wrap {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      aspect-ratio: 4/5;
+    }
+    .exp-image-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      will-change: transform;
+    }
+    .exp-image-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200,168,98,.12);
+      border-radius: var(--radius-lg);
+      pointer-events: none;
+    }
+
+    /* floating badge on image */
+    .exp-float-badge {
+      position: absolute;
+      bottom: 2rem;
+      right: -1.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid rgba(200,168,98,.15);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 16px 48px rgba(0,0,0,.5);
+      z-index: 2;
+      animation: float 5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .exp-float-badge .badge-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--gold), var(--coral));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: white;
+    }
+    .exp-float-badge .badge-text {
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .exp-float-badge .badge-text small {
+      display: block;
+      font-size: .7rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .exp-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .exp-content .section-heading { max-width: 20ch; }
+
+    .exp-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .exp-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .exp-feature {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+    }
+    .exp-feature-icon {
+      width: 40px; height: 40px; min-width: 40px;
+      border-radius: .75rem;
+      background: rgba(200,168,98,.08);
+      border: 1px solid rgba(200,168,98,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: .85rem;
+    }
+    .exp-feature h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .15rem;
+    }
+    .exp-feature p {
+      font-size: .72rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .btn-explore {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .8rem 2rem;
+      border: 1.5px solid var(--gold);
+      border-radius: 50px;
+      background: transparent;
+      color: var(--gold);
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      width: fit-content;
+    }
+    .btn-explore:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    .btn-explore i {
+      transition: transform .3s;
+    }
+    .btn-explore:hover i { transform: translateX(4px); }
+
+    /* ═══════════════════════════════════════════════════════
+       SERVICES — 3D FLOATING CARDS
+       ═══════════════════════════════════════════════════════ */
+    .services {
+      padding: 6rem clamp(1.5rem, 4vw, 4rem);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .services .section-header {
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 4rem;
+      perspective: 1200px;
+    }
+
+    .srv-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(200,168,98,.06);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: all .5s cubic-bezier(.16,1,.3,1);
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+    }
+    .srv-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(
+        ellipse at 50% 0%,
+        rgba(200,168,98,.06) 0%,
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    .srv-card:hover::before { opacity: 1; }
+    .srv-card:hover {
+      transform: translateY(-8px) rotateX(2deg);
+      border-color: rgba(200,168,98,.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+
+    .srv-icon {
+      width: 64px; height: 64px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, rgba(200,168,98,.1), rgba(232,96,60,.08));
+      border: 1px solid rgba(200,168,98,.12);
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--gold);
+      transition: transform .4s;
+    }
+    .srv-card:hover .srv-icon { transform: translateZ(20px) scale(1.08); }
+
+    .srv-card h3 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: .75rem;
+    }
+
+    .srv-card p {
+      font-size: .82rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       TESTIMONIALS
+       ═══════════════════════════════════════════════════════ */
+    .testimonials {
+      padding: 6rem clamp(1.5rem, 4vw, 4rem);
+      position: relative;
+      overflow: hidden;
+    }
+    .testimonials::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      right: -150px; top: -100px;
+      background: radial-gradient(circle, rgba(200,168,98,.06), transparent 70%);
+      pointer-events: none;
+    }
+
+    .testimonials-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .test-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(200,168,98,.06);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      position: relative;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .test-card:hover {
+      border-color: rgba(200,168,98,.15);
+      box-shadow: 0 12px 40px rgba(0,0,0,.25);
+    }
+
+    .test-card .quote-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      line-height: 1;
+      color: rgba(200,168,98,.15);
+      position: absolute;
+      top: 1rem; left: 2rem;
+    }
+
+    .test-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: rgba(240,235,227,.7);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .test-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .test-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--coral));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      font-weight: 700;
+      color: white;
+    }
+    .test-author-info .name {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .test-author-info .trip {
+      font-size: .72rem;
+      color: var(--text-muted);
+    }
+    .test-stars {
+      margin-left: auto;
+      color: var(--gold);
+      font-size: .7rem;
+      display: flex;
+      gap: .15rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       CTA — URGENCY BLOCK
+       ═══════════════════════════════════════════════════════ */
+    .cta-section {
+      padding: 6rem clamp(1.5rem, 4vw, 4rem) 8rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .cta-block {
+      position: relative;
+      border-radius: calc(var(--radius-lg) * 1.2);
+      overflow: hidden;
+      padding: 5rem 3.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .cta-block .cta-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .cta-block .cta-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .cta-block .cta-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(8,11,20,.92) 0%, rgba(8,11,20,.75) 100%),
+        radial-gradient(ellipse at 50% 80%, rgba(232,96,60,.15), transparent 70%);
+    }
+
+    .cta-block > * { position: relative; z-index: 1; }
+
+    .cta-block .section-label { margin-bottom: 0; }
+
+    .cta-block h2 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      max-width: 22ch;
+    }
+
+    .cta-block p {
+      font-size: .95rem;
+      color: var(--text-muted);
+      max-width: 50ch;
+      line-height: 1.7;
+    }
+
+    .cta-form {
+      display: flex;
+      gap: .75rem;
+      width: 100%;
+      max-width: 480px;
+      margin-top: .75rem;
+    }
+
+    .cta-input {
+      flex: 1;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(200,168,98,.15);
+      border-radius: 50px;
+      padding: .8rem 1.5rem;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: .85rem;
+      outline: none;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .cta-input::placeholder { color: var(--text-dim); }
+    .cta-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,168,98,.1);
+    }
+
+    .cta-submit {
+      padding: .8rem 2rem;
+      border-radius: 50px;
+      background: var(--coral);
+      color: white;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      white-space: nowrap;
+    }
+    .cta-submit:hover {
+      background: #d44e2e;
+      transform: translateY(-1px);
+    }
+
+    .cta-trust {
+      font-size: .7rem;
+      color: var(--text-dim);
+      margin-top: .25rem;
+    }
+    .cta-trust i { color: var(--gold); margin-right: .3rem; }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════ */
+    .footer {
+      border-top: 1px solid rgba(200,168,98,.08);
+      padding: 4.5rem clamp(1.5rem, 4vw, 4rem) 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .footer-brand-col .brand {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .footer-brand-col p {
+      font-size: .82rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 30ch;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: .5rem;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,168,98,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      color: var(--text-muted);
+      transition: all .3s;
+    }
+    .footer-social a:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(200,168,98,.06);
+    }
+
+    .footer-col h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: .65rem;
+      cursor: pointer;
+      transition: color .2s;
+    }
+    .footer-col li:hover { color: var(--text); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 3rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(200,168,98,.06);
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: var(--text-dim);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .dest-grid { grid-template-columns: repeat(2, 1fr); }
+      .experience { grid-template-columns: 1fr; }
+      .exp-float-badge { right: 1rem; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .dest-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .services-grid { grid-template-columns: 1fr; }
+      .test-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      .cta-form { flex-direction: column; }
+      .hero-actions { flex-direction: column; }
+      .hero-title { font-size: clamp(2.5rem, 9vw, 4rem); }
+      .footer-bottom { flex-direction: column; gap: .5rem; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       NAVBAR
+       ═══════════════════════════════════════════════════════ -->
+  <nav class="nav" id="navbar">
+    <a href="#" class="nav-brand">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 2C8.82 2 3 7.82 3 15c0 10 13 19 13 19s13-9 13-19c0-7.18-5.82-13-13-13z" fill="none" stroke="#C8A862" stroke-width="1.5"/>
+        <circle cx="16" cy="15" r="4" fill="none" stroke="#C8A862" stroke-width="1.5"/>
+        <circle cx="16" cy="15" r="1.5" fill="#C8A862"/>
+      </svg>
+      <span>Travlog</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#destinations">Destinations</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#stories">Stories</a></li>
+    </ul>
+
+    <button class="nav-cta">Book Now</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg" id="heroBg">
+      <img
+        src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1920&h=1080&fit=crop&q=80&auto=format"
+        alt="Crystal clear ocean"
+      />
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-tag">
+        <i class="fas fa-compass"></i>
+        Handcrafted luxury journeys
+      </div>
+
+      <h1 class="hero-title" id="heroTitle">
+        <span class="word" style="animation-delay:.4s">Escape</span>
+        <span class="word" style="animation-delay:.5s">the</span>
+        <span class="word" style="animation-delay:.6s"><em>Ordinary.</em></span><br>
+        <span class="word" style="animation-delay:.75s">Discover</span>
+        <span class="word" style="animation-delay:.85s">the</span>
+        <span class="word" style="animation-delay:.95s"><em>Extraordinary.</em></span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Life is too short for ordinary vacations. We architect journeys to the
+        world's most breathtaking destinations — every sunset, every detail,
+        perfected.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-hero primary">
+          Explore Destinations <i class="fas fa-arrow-right"></i>
+        </button>
+        <button class="btn-hero ghost">
+          <i class="fas fa-play"></i> Watch Our Story
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STATS
+       ═══════════════════════════════════════════════════════ -->
+  <div class="stats" data-animate="fade-up">
+    <div class="stat-item" data-delay="1">
+      <div class="stat-number" data-count="12000">0</div>
+      <div class="stat-label">Happy Travelers</div>
+    </div>
+    <div class="stat-item" data-delay="2">
+      <div class="stat-number" data-count="120">0</div>
+      <div class="stat-label">Destinations</div>
+    </div>
+    <div class="stat-item" data-delay="3">
+      <div class="stat-number" data-count="98">0</div>
+      <div class="stat-label">Satisfaction Rate</div>
+    </div>
+    <div class="stat-item" data-delay="4">
+      <div class="stat-number" data-count="15">0</div>
+      <div class="stat-label">Years of Excellence</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       DESTINATIONS
+       ═══════════════════════════════════════════════════════ -->
+  <section class="destinations" id="destinations">
+    <div class="section-header">
+      <div data-animate="fade-right">
+        <div class="section-label">Curated destinations</div>
+        <h2 class="section-heading">Places that will steal your breath away</h2>
+      </div>
+      <p class="section-sub" data-animate="fade-left">
+        Each destination is handpicked by our travel architects.
+        These aren't just trips — they're transformative experiences.
+      </p>
+    </div>
+
+    <div class="dest-grid">
+      <div class="dest-card" data-tilt data-animate="scale-in" data-delay="1">
+        <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&h=800&fit=crop&q=80&auto=format" alt="Santorini" />
+        <div class="dest-glare"></div>
+        <div class="dest-tag">Most Popular</div>
+        <div class="dest-overlay">
+          <div class="dest-info">
+            <h3>Santorini, Greece</h3>
+            <div class="dest-meta">
+              <span><i class="fas fa-location-dot"></i> Aegean Sea</span>
+              <span class="rating"><i class="fas fa-star"></i> 4.9</span>
+              <span>7 days</span>
+            </div>
+            <div class="dest-bottom">
+              <div class="dest-price">
+                R$ 4.890
+                <small>per person</small>
+              </div>
+              <button class="dest-book">Book Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dest-card" data-tilt data-animate="scale-in" data-delay="2">
+        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=800&fit=crop&q=80&auto=format" alt="Bali" />
+        <div class="dest-glare"></div>
+        <div class="dest-tag">Best Value</div>
+        <div class="dest-overlay">
+          <div class="dest-info">
+            <h3>Bali, Indonesia</h3>
+            <div class="dest-meta">
+              <span><i class="fas fa-location-dot"></i> Indian Ocean</span>
+              <span class="rating"><i class="fas fa-star"></i> 4.8</span>
+              <span>10 days</span>
+            </div>
+            <div class="dest-bottom">
+              <div class="dest-price">
+                R$ 3.250
+                <small>per person</small>
+              </div>
+              <button class="dest-book">Book Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dest-card" data-tilt data-animate="scale-in" data-delay="3">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=800&fit=crop&q=80&auto=format" alt="Swiss Alps" />
+        <div class="dest-glare"></div>
+        <div class="dest-tag">Adventure</div>
+        <div class="dest-overlay">
+          <div class="dest-info">
+            <h3>Swiss Alps</h3>
+            <div class="dest-meta">
+              <span><i class="fas fa-location-dot"></i> Switzerland</span>
+              <span class="rating"><i class="fas fa-star"></i> 4.9</span>
+              <span>5 days</span>
+            </div>
+            <div class="dest-bottom">
+              <div class="dest-price">
+                R$ 6.780
+                <small>per person</small>
+              </div>
+              <button class="dest-book">Book Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dest-card" data-tilt data-animate="scale-in" data-delay="4">
+        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&h=800&fit=crop&q=80&auto=format" alt="Maldives" />
+        <div class="dest-glare"></div>
+        <div class="dest-tag">Luxury</div>
+        <div class="dest-overlay">
+          <div class="dest-info">
+            <h3>Maldives</h3>
+            <div class="dest-meta">
+              <span><i class="fas fa-location-dot"></i> Indian Ocean</span>
+              <span class="rating"><i class="fas fa-star"></i> 5.0</span>
+              <span>8 days</span>
+            </div>
+            <div class="dest-bottom">
+              <div class="dest-price">
+                R$ 8.490
+                <small>per person</small>
+              </div>
+              <button class="dest-book">Book Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       EXPERIENCE
+       ═══════════════════════════════════════════════════════ -->
+  <section class="experience" id="experience">
+    <div class="exp-image-wrap" data-animate="fade-right">
+      <img
+        src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=1000&fit=crop&q=80&auto=format"
+        alt="Open road adventure"
+        id="expImg"
+      />
+      <div class="exp-float-badge">
+        <div class="badge-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="badge-text">
+          100% Protected
+          <small>Full refund guarantee</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-content" data-animate="fade-left">
+      <div class="section-label">Why Travlog</div>
+      <h2 class="section-heading">We don't sell trips.<br>We craft <em>memories.</em></h2>
+
+      <p class="exp-text">
+        Every journey is meticulously designed by our team of travel architects.
+        From the moment you land to your final sunset — every detail is
+        orchestrated to create an experience that stays with you forever.
+      </p>
+
+      <div class="exp-features">
+        <div class="exp-feature" data-animate="fade-up" data-delay="1">
+          <div class="exp-feature-icon"><i class="fas fa-map-location-dot"></i></div>
+          <div>
+            <h4>Local Experts</h4>
+            <p>Curated by people who live and breathe each destination.</p>
+          </div>
+        </div>
+        <div class="exp-feature" data-animate="fade-up" data-delay="2">
+          <div class="exp-feature-icon"><i class="fas fa-gem"></i></div>
+          <div>
+            <h4>Luxury Stays</h4>
+            <p>Handpicked 5-star hotels and hidden boutique retreats.</p>
+          </div>
+        </div>
+        <div class="exp-feature" data-animate="fade-up" data-delay="3">
+          <div class="exp-feature-icon"><i class="fas fa-route"></i></div>
+          <div>
+            <h4>Seamless Logistics</h4>
+            <p>Flights, transfers, visas — we handle everything.</p>
+          </div>
+        </div>
+        <div class="exp-feature" data-animate="fade-up" data-delay="4">
+          <div class="exp-feature-icon"><i class="fas fa-headset"></i></div>
+          <div>
+            <h4>24/7 Concierge</h4>
+            <p>A personal travel assistant at every step.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-explore">
+        Learn More About Us <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SERVICES
+       ═══════════════════════════════════════════════════════ -->
+  <section class="services" id="services">
+    <div class="section-header" data-animate="fade-up">
+      <div class="section-label">What we offer</div>
+      <h2 class="section-heading" style="max-width:24ch;text-align:center">
+        Everything you need for<br>the <em>perfect</em> getaway
+      </h2>
+    </div>
+
+    <div class="services-grid">
+      <div class="srv-card" data-animate="fade-up" data-delay="1">
+        <div class="srv-icon"><i class="fas fa-plane-departure"></i></div>
+        <h3>Flight Booking</h3>
+        <p>Premium seats on the world's top airlines. Business class upgrades at insider prices you won't find anywhere else.</p>
+      </div>
+      <div class="srv-card" data-animate="fade-up" data-delay="2">
+        <div class="srv-icon"><i class="fas fa-hotel"></i></div>
+        <h3>Curated Stays</h3>
+        <p>From overwater villas to mountain chalets — every accommodation is personally inspected by our team.</p>
+      </div>
+      <div class="srv-card" data-animate="fade-up" data-delay="3">
+        <div class="srv-icon"><i class="fas fa-camera-retro"></i></div>
+        <h3>Unique Experiences</h3>
+        <p>Private sunset sails, chef's table dinners, helicopter tours — moments that become stories you tell forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TESTIMONIALS
+       ═══════════════════════════════════════════════════════ -->
+  <section class="testimonials" id="stories">
+    <div class="testimonials-inner">
+      <div class="section-header" data-animate="fade-up">
+        <div>
+          <div class="section-label">Traveler stories</div>
+          <h2 class="section-heading">12,000+ travelers can't be wrong</h2>
+        </div>
+      </div>
+
+      <div class="test-grid">
+        <div class="test-card" data-animate="fade-up" data-delay="1">
+          <div class="quote-mark">"</div>
+          <p class="test-text">
+            Travlog turned our honeymoon into something beyond our wildest dreams.
+            The private dinner on the beach in Bali, the surprise helicopter tour
+            over the rice terraces — these aren't things you can Google. This is
+            artistry.
+          </p>
+          <div class="test-author">
+            <div class="test-avatar">MC</div>
+            <div class="test-author-info">
+              <div class="name">Marina & Carlos</div>
+              <div class="trip">Bali · 12 days · 2024</div>
+            </div>
+            <div class="test-stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="test-card" data-animate="fade-up" data-delay="2">
+          <div class="quote-mark">"</div>
+          <p class="test-text">
+            I've traveled with luxury agencies before. Travlog is different.
+            They don't just book things — they anticipate what you want before
+            you even know you want it. The Maldives trip was the single best
+            week of my life.
+          </p>
+          <div class="test-author">
+            <div class="test-avatar">RL</div>
+            <div class="test-author-info">
+              <div class="name">Ricardo Lima</div>
+              <div class="trip">Maldives · 8 days · 2024</div>
+            </div>
+            <div class="test-stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       CTA
+       ═══════════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="cta-block" data-animate="scale-in">
+      <div class="cta-bg">
+        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&h=600&fit=crop&q=80&auto=format" alt="" />
+      </div>
+
+      <div class="section-label">Limited availability</div>
+      <h2>Your dream destination is one click away</h2>
+      <p>
+        Join 12,000+ travelers who chose extraordinary.
+        Peak season is filling fast — secure your spot today and save up to 30%.
+      </p>
+
+      <form class="cta-form" onsubmit="return false;">
+        <input class="cta-input" type="email" placeholder="Enter your email" />
+        <button class="cta-submit" type="submit">Get Started</button>
+      </form>
+
+      <div class="cta-trust">
+        <i class="fas fa-lock"></i> No spam. Unsubscribe anytime. Your adventure starts in your inbox.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand-col">
+        <div class="brand">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <path d="M16 2C8.82 2 3 7.82 3 15c0 10 13 19 13 19s13-9 13-19c0-7.18-5.82-13-13-13z" fill="none" stroke="#C8A862" stroke-width="1.5"/>
+            <circle cx="16" cy="15" r="4" fill="none" stroke="#C8A862" stroke-width="1.5"/>
+            <circle cx="16" cy="15" r="1.5" fill="#C8A862"/>
+          </svg>
+          Travlog
+        </div>
+        <p>
+          Crafting extraordinary travel experiences since 2009.
+          Every journey tells a story — let us write yours.
+        </p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li>About Us</li>
+          <li>Careers</li>
+          <li>Press</li>
+          <li>Blog</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li>Help Center</li>
+          <li>Safety</li>
+          <li>Cancellation</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li>+55 11 9876-5432</li>
+          <li>hello@travlog.com</li>
+          <li>Av. Paulista 1000</li>
+          <li>São Paulo, SP</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2024 Travlog. All rights reserved.</span>
+      <span>Privacy Policy &middot; Terms of Service</span>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SCRIPTS
+       ═══════════════════════════════════════════════════════ -->
+  <script>
+    /* ─── Scroll Progress ──────────────────────────────── */
+    const progressBar = document.getElementById('scrollProgress');
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+    }
+
+    /* ─── Navbar Scroll State ──────────────────────────── */
+    const navbar = document.getElementById('navbar');
+    function updateNav() {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }
+
+    /* ─── Parallax Hero ────────────────────────────────── */
+    const heroBg = document.querySelector('.hero-bg img');
+    function updateParallax() {
+      if (window.scrollY < window.innerHeight * 1.2) {
+        heroBg.style.transform = `translateY(${window.scrollY * 0.35}px) scale(1.05)`;
+      }
+    }
+
+    /* ─── Scroll Event (single listener, perf) ─────────── */
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateProgress();
+          updateNav();
+          updateParallax();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    /* ─── Scroll-Triggered Animations ──────────────────── */
+    const animObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+
+          // trigger counter animation for stat numbers
+          const counters = entry.target.querySelectorAll('[data-count]');
+          counters.forEach(el => animateCounter(el));
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('[data-animate]').forEach(el => animObserver.observe(el));
+
+    /* ─── Counter Animation ────────────────────────────── */
+    function animateCounter(el) {
+      if (el.dataset.animated) return;
+      el.dataset.animated = '1';
+
+      const target = parseInt(el.dataset.count);
+      const duration = 2000;
+      const start = performance.now();
+
+      const suffixes = { 12000: '+', 120: '+', 98: '%', 15: '' };
+      const formats = { 12000: v => (v/1000).toFixed(v >= 1000 ? 0 : 0) + 'K', 120: v => v, 98: v => v, 15: v => v };
+
+      function tick(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(ease * target);
+
+        if (target >= 1000) {
+          el.textContent = (current / 1000).toFixed(current >= 1000 && current < target ? 1 : 0) + 'K+';
+        } else {
+          el.textContent = current + (suffixes[target] || '');
+        }
+
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    /* ─── 3D Tilt Cards ────────────────────────────────── */
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      const glare = card.querySelector('.dest-glare');
+
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+
+        const rotateY = ((x - cx) / cx) * 8;
+        const rotateX = ((y - cy) / cy) * -8;
+
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+
+        if (glare) {
+          const gx = (x / rect.width) * 100;
+          const gy = (y / rect.height) * 100;
+          glare.style.setProperty('--glare-x', gx + '%');
+          glare.style.setProperty('--glare-y', gy + '%');
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+
+    /* ─── Experience Image Parallax ────────────────────── */
+    const expImg = document.getElementById('expImg');
+    if (expImg) {
+      const expObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const onScroll = () => {
+              const rect = entry.target.getBoundingClientRect();
+              const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+              const translateY = (progress - 0.5) * -40;
+              expImg.style.transform = `translateY(${translateY}px) scale(1.08)`;
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+          }
+        });
+      }, { threshold: 0 });
+      expObserver.observe(expImg.closest('.exp-image-wrap'));
+    }
+  </script>
+</body>
+</html>
