@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI SSE Demo</title>
+</head>
+
+<body>
+    <h1>Server-Sent Events (SSE) Demo with FastAPI</h1>
+    <h1>Items</h1>
+    <div id="messages"
+        style="font-family: monospace; background: #eee; padding: 10px; height: 300px; overflow-y: scroll;"></div>
+    <script defer async>
+        const server = "localhost:8000"
+        const divMessages = document.querySelector("#messages")
+        divMessages.textContent = "Connecting to server...\n"
+        const evtSource = new EventSource(`//${server}/events/stream`, {
+        })
+        evtSource.onmessage = (event) => {
+            
+            const li  = document.createElement("p")
+            li.textContent = `MESSAGE: ${event.data}`
+            divMessages.appendChild(li)
+        }
+
+        evtSource.addEventListener("items", (event) => {
+            
+                if (event.data == "\"END\"") {
+                    console.log("FIM")
+                    evtSource.close();
+                    return;
+                }
+                const newElement = document.createElement("p");
+                newElement.textContent = `item: ${event.data}`;
+                divMessages.appendChild(newElement);
+            });
+
+       
+    </script>
+
+</body>
+
+</html>
