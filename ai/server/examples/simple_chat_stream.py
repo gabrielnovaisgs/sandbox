@@ -8,8 +8,8 @@ from langgraph.constants import END, START
 from operator import add
 from typing import Annotated
 from langgraph.checkpoint.memory import InMemorySaver  
-load_dotenv()
 
+load_dotenv()
 api_key = os.getenv("OPENROUTER_API_KEY")
 
 model = ChatOpenRouter(
@@ -35,7 +35,7 @@ def input_node(state: State) -> State:
 
 def response_node(state: State) -> State:
     response = model.invoke(state['messages'])
-    print(f"AI: {response.content}")
+    print("\n")
     return {'count': 1, 'messages': response}
 
 def handle_exit(state: State):
@@ -59,9 +59,28 @@ builder.add_edge("response", "input")
 
 
 checkpointer = InMemorySaver()
-graph = builder.compile(checkpointer=checkpointer)
-config = {"configurable": {"thread_id": "1"}}
-response = graph.invoke(State(count=0), config )
-print(response)
+graph = builder.compile(checkpointer)
 
-response = graph.invoke(State(count=0), config )
+config = {"configurable": {"thread_id": "1"}}
+
+# o Stream realiza o invoke do grafo, porém podendo escutar 
+for chunk in graph.stream(
+    {"count": 0},
+    stream_mode=["messages", "checkpoints"],
+    version="v2",
+    config=config
+):
+    # Olhando os checkpoints salvos em cada passoo da minha conversa, ele basicamente esta salvando cada etapa e cada passo que eu estou dando no meu nó
+    #if chunk["type"] == "checkpoints":
+    #    snapshot = chunk["data"]       # StateSnapshot completo
+    #    print(f"Checkpoint {snapshot['metadata']['step']}:")
+    #    print(f"Estado: {snapshot['values']}")
+    #    print(f"Próximos: {snapshot['next']}")
+    if chunk["type"] == "messages":
+        message_chunk, metadata = chunk["data"]
+        if message_chunk.content and metadata["langgraph_node"] == "response":
+             print(message_chunk.content, end="", flush=True)
+
+
+
+
