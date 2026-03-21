@@ -1,0 +1,8 @@
+Lista de Profissões:
+- Engenheiro de Software
+- Médico
+- Professor
+- Arquiteto
+- Contador
+- Advogado
+- Designer

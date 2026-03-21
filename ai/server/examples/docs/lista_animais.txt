@@ -1,0 +1,8 @@
+Lista de Animais:
+- Leão
+- Tigre
+- Elefante
+- Girafa
+- Urso-polar
+- Cachorro
+- Gato

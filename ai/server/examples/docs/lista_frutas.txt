@@ -1,0 +1,8 @@
+Lista de Frutas:
+- Maçã
+- Banana
+- Laranja
+- Morango
+- Melancia
+- Abacaxi
+- Uva

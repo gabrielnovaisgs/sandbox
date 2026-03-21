@@ -1,0 +1,8 @@
+Lista de Países:
+- Brasil
+- Japão
+- Canadá
+- Austrália
+- Alemanha
+- Itália
+- África do Sul
