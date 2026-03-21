@@ -7,6 +7,7 @@ dir_path = "./examples/docs"
 @tool("list_docs", description="Lista todos os documentos pessoais")
 def list_docs() -> str:
     """Busca os documentos disponíveis no diretório"""
+    print("listou os documentos")
     items = os.listdir(dir_path)
     return ", ".join(items)
 
