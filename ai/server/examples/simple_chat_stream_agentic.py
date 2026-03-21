@@ -1,5 +1,5 @@
 from tools import list_docs, get_list
-from model import model
+from llm import model
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage, ToolMessage
 from langchain.agents import create_agent
 from typing import List, Annotated

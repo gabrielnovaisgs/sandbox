@@ -1,24 +1,11 @@
 from langchain_core.messages import SystemMessage
-import os
-from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_openrouter import ChatOpenRouter
 from langgraph.graph  import StateGraph, MessagesState
 from langgraph.constants import END, START
 from operator import add
 from typing import Annotated
 from langgraph.checkpoint.memory import InMemorySaver  
-
-load_dotenv()
-api_key = os.getenv("OPENROUTER_API_KEY")
-
-model = ChatOpenRouter(
-    model_name="nvidia/nemotron-3-nano-30b-a3b:free",
-    api_key=api_key,
-    reasoning={
-        "effort": "none", # Desabilita o reasoning do modelo
-    }
-)
+from llm import model
 
 
 class State(MessagesState):
